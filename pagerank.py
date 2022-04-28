@@ -8,11 +8,11 @@ SAMPLES = 10000
 
 
 def main():
-    if len(sys.argv) != 2:
-        sys.exit("Usage: python pagerank.py corpus")
-    # directory = "/Users/kingsley/Documents/cs50-ai/uncertainty/uncertainty-projects/pagerank/corpus0"
-    corpus = crawl(sys.argv[1])
-    #corpus = crawl(directory)
+    # if len(sys.argv) != 2:
+    #     sys.exit("Usage: python pagerank.py corpus")
+    directory = "/Users/kingsley/Documents/cs50-ai/uncertainty/uncertainty-projects/pagerank/corpus0"
+    #corpus = crawl(sys.argv[1])
+    corpus = crawl(directory)
     ranks = sample_pagerank(corpus, DAMPING, SAMPLES)
     print(f"PageRank Results from Sampling (n = {SAMPLES})")
     for page in sorted(ranks):
@@ -144,18 +144,21 @@ def iterate_pagerank(corpus, damping_factor):
             # sum the pages in a link
             for value in values:
                 n = len(corpus[value])  # length of links of that value
-                sum_page += page_rank[value]/n
+                if n == 0:
+                    sum_page += 1/len(corpus)
+                else:
+                    sum_page += page_rank[value]/n
             page_rank[page] = ((1 - damping_factor)/len(corpus)
                                ) + (sum_page * damping_factor)
 
         # check delta after 2+ iterations
         if iter > 1:
-            for k in page_rank:
+            for k, v in page_rank.items():
                 if abs(temp[k]-page_rank[k]) < delta:
                     count += 1
 
         # if counter is 4 then all are within 0.001
-        if count == 4:
+        if count == len(corpus):
             print("iter", iter)
             return page_rank
 
